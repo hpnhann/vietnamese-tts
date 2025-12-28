@@ -2,7 +2,7 @@
 
 Một ứng dụng chuyển đổi văn bản thành giọng nói tiếng Việt chuyên nghiệp, hiện đại và mạnh mẽ, được xây dựng bằng **Next.js 15** và **Google Cloud TTS API**.
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=Vietnamese+TTS+Pro+Screenshot)
+![Project Banner](public/project_banner.png)
 
 ## ✨ Tính Năng Nổi Bật
 
