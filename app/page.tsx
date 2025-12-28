@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Volume2, Pause, Play, RotateCcw, Download, Loader2, Moon, Sun, Keyboard, Trash2, Upload, FileText, History, X, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { parseFile, detectCSVDelimiter } from './utils/fileParser';
 import FilePreviewModal, { FilePreviewData } from './components/FilePreviewModal';
+import WaveformPlayer, { WaveformPlayerRef } from './components/WaveformPlayer';
 
 interface Voice {
   id: string;
@@ -50,14 +51,15 @@ const VietnameseTTS = () => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [testResults, setTestResults] = useState<any[]>([]);
-  const [showTests, setShowTests] = useState<boolean>(false);
   const [showFilePreview, setShowFilePreview] = useState<boolean>(false);
   const [filePreview, setFilePreview] = useState<FilePreviewData | null>(null);
   const [selectedSheets, setSelectedSheets] = useState<string[]>([]);
   const [selectedDelimiter, setSelectedDelimiter] = useState<'comma' | 'semicolon' | 'tab'>('comma');
+  const [previewingVoiceId, setPreviewingVoiceId] = useState<string | null>(null);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // const audioRef = useRef<HTMLAudioElement | null>(null); // Removed in favor of WaveformPlayer
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const waveformRef = useRef<WaveformPlayerRef>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const voices: Voice[] = [
@@ -65,8 +67,8 @@ const VietnameseTTS = () => {
     { id: 'vi-VN-Neural2-D', name: '🎙️ Neural2-D - Nam (Khuyến nghị)', gender: 'male' },
     { id: 'vi-VN-Wavenet-A', name: '🔊 Wavenet-A - Nữ', gender: 'female' },
     { id: 'vi-VN-Wavenet-B', name: '🔊 Wavenet-B - Nam', gender: 'male' },
-    { id: 'vi-VN-Wavenet-C', name: '🔊 Wavenet-C - Nam (Trẻ)', gender: 'male' },
-    { id: 'vi-VN-Wavenet-D', name: '🔊 Wavenet-D - Nữ (Trẻ)', gender: 'female' },
+    { id: 'vi-VN-Wavenet-C', name: '🔊 Wavenet-C - Nữ (Trẻ)', gender: 'female' },
+    { id: 'vi-VN-Wavenet-D', name: '🔊 Wavenet-D - Nam (Trẻ)', gender: 'male' },
   ];
 
   const speeds: Speed[] = [
@@ -371,59 +373,65 @@ const VietnameseTTS = () => {
   };
 
   // ==================== TESTING UTILITIES ====================
-  const runTests = async () => {
-    setShowTests(true);
-    setTestResults([]);
 
-    const tests = [
-      {
-        name: 'Cache System',
-        test: async () => {
-          const testText = 'Test cache ' + Date.now();
-          saveToCache(testText, 'vi-VN-Neural2-A', 1, 'test-url');
-          const cached = getFromCache(testText, 'vi-VN-Neural2-A', 1);
-          return cached === 'test-url';
-        }
-      },
-      {
-        name: 'History System',
-        test: async () => {
-          const testText = 'Test history ' + Date.now();
-          saveToHistory(testText, 'vi-VN-Neural2-A', 1);
-          const historyData = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-          return historyData.length > 0;
-        }
-      },
-      {
-        name: 'Voice Selection',
-        test: async () => {
-          return voices.length === 6;
-        }
-      },
-      {
-        name: 'Speed Control',
-        test: async () => {
-          return speeds.length === 6;
-        }
-      },
-      {
-        name: 'Dark Mode',
-        test: async () => {
-          setDarkMode(true);
-          await new Promise(r => setTimeout(r, 100));
-          setDarkMode(false);
-          return true;
-        }
-      }
-    ];
+  // ==================== VOICE PREVIEW ====================
+  const handleVoicePreview = async (voiceId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
 
-    for (const test of tests) {
-      try {
-        const result = await test.test();
-        setTestResults(prev => [...prev, { name: test.name, passed: result }]);
-      } catch (err) {
-        setTestResults(prev => [...prev, { name: test.name, passed: false }]);
+    // If currently playing this voice, pause/stop it
+    if (previewingVoiceId === voiceId) {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+        previewAudioRef.current.currentTime = 0;
       }
+      setPreviewingVoiceId(null);
+      return;
+    }
+
+    // Stop any other preview
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current.currentTime = 0;
+    }
+
+    // Stop Main Waveform Player if playing
+    if (waveformRef.current && isPlaying) {
+      waveformRef.current.pause();
+      setIsPlaying(false);
+    }
+
+    try {
+      setPreviewingVoiceId(voiceId);
+      const previewText = "Xin chào, tôi là trợ lý ảo của bạn.";
+      const cacheKey = `preview-${voiceId}`;
+      let previewUrl = localStorage.getItem(cacheKey);
+
+      if (!previewUrl) {
+        const response = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: previewText, voice: voiceId, speed: 1 }),
+        });
+        if (!response.ok) throw new Error('Preview failed');
+        const blob = await response.blob();
+        previewUrl = URL.createObjectURL(blob);
+        // Only cache locally for the session if needed, but blob URLs expire
+      }
+
+      const audio = new Audio(previewUrl);
+      previewAudioRef.current = audio;
+
+      audio.onended = () => {
+        setPreviewingVoiceId(null);
+      };
+
+      await audio.play();
+
+    } catch (err) {
+      console.error('Preview error:', err);
+      showSuccessMessage('⚠️ Không thể nghe thử giọng này');
+      setPreviewingVoiceId(null);
     }
   };
 
@@ -443,13 +451,7 @@ const VietnameseTTS = () => {
     if (cachedAudio) {
       setCacheHit(true);
       setAudioUrl(cachedAudio);
-
-      if (audioRef.current) {
-        audioRef.current.src = cachedAudio;
-        audioRef.current.load();
-        audioRef.current.play();
-        setIsPlaying(true);
-      }
+      setIsPlaying(true);
 
       setTimeout(() => setCacheHit(false), 2000);
       return;
@@ -480,13 +482,8 @@ const VietnameseTTS = () => {
       saveToCache(text, selectedVoice, playbackRate, newAudioUrl);
       saveToHistory(text, selectedVoice, playbackRate);
 
-      if (audioRef.current) {
-        audioRef.current.src = newAudioUrl;
-        audioRef.current.load();
-        audioRef.current.play();
-        setIsPlaying(true);
-      }
-
+      // Playback is now handled by WaveformPlayer automatically when audioUrl changes
+      setIsPlaying(true);
       setIsLoading(false);
 
     } catch (err: any) {
@@ -496,25 +493,37 @@ const VietnameseTTS = () => {
   };
 
   const handlePlayPause = () => {
-    if (audioRef.current && audioUrl) {
+    // If preview is playing, stop it
+    if (previewingVoiceId && previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      setPreviewingVoiceId(null);
+    }
+
+    if (audioUrl) {
+      // Use Waveform Player
       if (isPlaying) {
-        audioRef.current.pause();
+        waveformRef.current?.pause();
         setIsPlaying(false);
       } else {
-        audioRef.current.play();
+        waveformRef.current?.play();
         setIsPlaying(true);
       }
     } else {
-      generateSpeech();
+      generateSpeech(); // Trigger generation if no audio
     }
   };
 
   const handleStop = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+    if (previewingVoiceId && previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current.currentTime = 0;
+      setPreviewingVoiceId(null);
+    }
+
+    if (audioUrl) {
+      waveformRef.current?.pause();
+      waveformRef.current?.seek(0); // Reset waveform to start
       setIsPlaying(false);
-      setCurrentTime(0);
     }
   };
 
@@ -530,40 +539,12 @@ const VietnameseTTS = () => {
     setCacheHit(false);
   }, [text, selectedVoice, playbackRate]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-      setDuration(audio.duration);
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    };
-
-    const handleError = () => {
-      setError('Lỗi khi phát audio');
-      setIsPlaying(false);
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-    };
-  }, [audioUrl]);
+  // Removed audioRef event listeners useEffect as WaveformPlayer handles events
 
   const handleSpeedChange = (speed: number) => {
     setPlaybackRate(speed);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = speed;
+    if (waveformRef.current) {
+      waveformRef.current.setPlaybackRate(speed);
     }
   };
 
@@ -710,16 +691,6 @@ const VietnameseTTS = () => {
               <Keyboard className="w-5 h-5" />
             </button>
 
-            <button
-              onClick={runTests}
-              className={`p-3 rounded-full transition-all ${darkMode
-                ? 'bg-gray-800 text-green-400 hover:bg-gray-700'
-                : 'bg-white text-green-600 hover:bg-gray-100 shadow-md'
-                }`}
-              title="Run Tests"
-            >
-              <CheckCircle className="w-5 h-5" />
-            </button>
 
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -767,29 +738,6 @@ const VietnameseTTS = () => {
               </div>
             )}
 
-            {/* Test Results */}
-            {showTests && testResults.length > 0 && (
-              <div className={`mb-6 p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    🧪 Test Results
-                  </h3>
-                  <button onClick={() => setShowTests(false)} className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                {testResults.map((result, idx) => (
-                  <div key={idx} className={`flex items-center gap-3 mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {result.passed ? (
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                    ) : (
-                      <AlertCircle className="w-5 h-5 text-red-500" />
-                    )}
-                    <span>{result.name}</span>
-                  </div>
-                ))}
-              </div>
-            )}
 
             {cacheHit && (
               <div className={`mb-4 p-3 rounded-lg text-center ${darkMode ? 'bg-green-900 text-green-200' : 'bg-green-50 text-green-800'}`}>
@@ -897,22 +845,55 @@ const VietnameseTTS = () => {
               {/* Settings */}
               <div className={`px-6 py-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Voice Selection - Refactored to Grid */}
                   <div>
                     <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                       Chọn giọng đọc
                     </label>
-                    <select
-                      value={selectedVoice}
-                      onChange={(e) => setSelectedVoice(e.target.value)}
-                      className={`w-full p-2.5 rounded-lg border ${darkMode
-                        ? 'bg-gray-700 border-gray-600 text-white'
-                        : 'bg-white border-gray-200 text-gray-900'
-                        }`}
-                    >
+                    <div className="grid grid-cols-1 gap-3">
                       {voices.map(voice => (
-                        <option key={voice.id} value={voice.id}>{voice.name}</option>
+                        <div
+                          key={voice.id}
+                          className={`p-3 rounded-lg border cursor-pointer flex items-center justify-between transition-all ${selectedVoice === voice.id
+                            ? darkMode ? 'bg-blue-900 border-blue-500 bg-opacity-30' : 'bg-blue-50 border-blue-500'
+                            : darkMode ? 'bg-gray-800 border-gray-700 hover:border-gray-500' : 'bg-white border-gray-200 hover:border-gray-300'
+                            }`}
+                          onClick={() => setSelectedVoice(voice.id)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedVoice === voice.id
+                              ? 'border-blue-500'
+                              : darkMode ? 'border-gray-500' : 'border-gray-300'
+                              }`}>
+                              {selectedVoice === voice.id && (
+                                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                              )}
+                            </div>
+                            <div className="text-sm">
+                              <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                {voice.name}
+                              </div>
+                              <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                {voice.gender === 'female' ? 'Nữ' : 'Nam'}
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={(e) => handleVoicePreview(voice.id, e)}
+                            className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-700 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-blue-600'
+                              }`}
+                            title={previewingVoiceId === voice.id ? "Dừng nghe thử" : "Nghe thử"}
+                          >
+                            {previewingVoiceId === voice.id ? (
+                              <Pause className="w-4 h-4 text-blue-500 animate-pulse" />
+                            ) : (
+                              <Play className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
                       ))}
-                    </select>
+                    </div>
                   </div>
 
                   <div>
@@ -942,10 +923,10 @@ const VietnameseTTS = () => {
                 <div className="flex items-center justify-center gap-4">
                   <button
                     onClick={handleStop}
-                    disabled={!isPlaying}
-                    className={`p-4 rounded-full transition-all ${isPlaying
-                      ? darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    disabled={!isPlaying && !audioUrl} // Disable if not playing and no audio loaded
+                    className={`p-4 rounded-full transition-all ${(!isPlaying && !audioUrl)
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'
                       }`}
                     title="Restart (R)"
                   >
@@ -983,17 +964,26 @@ const VietnameseTTS = () => {
                   </button>
                 </div>
 
-                <audio ref={audioRef} className="hidden" />
+                {/* Removed hidden audio element */}
 
-                {audioUrl && duration > 0 && (
-                  <div className="mt-4">
-                    <div className={`h-2 rounded-full overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                      <div className={`h-full ${darkMode ? 'bg-blue-500' : 'bg-blue-600'}`} style={{ width: `${(currentTime / duration) * 100}%` }} />
-                    </div>
-                    <div className={`flex justify-between mt-1 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      <span>{formatTime(currentTime)}</span>
-                      <span>{formatTime(duration)}</span>
-                    </div>
+                {audioUrl ? (
+                  <div className="mt-6 w-full">
+                    <WaveformPlayer
+                      ref={waveformRef}
+                      audioUrl={audioUrl}
+                      darkMode={darkMode}
+                      onEnded={() => setIsPlaying(false)}
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onTimeUpdate={(time, duration) => {
+                        setCurrentTime(time);
+                        setDuration(duration);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className={`mt-6 p-4 rounded-lg text-center text-sm ${darkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-100 text-gray-500'}`}>
+                    Nhập văn bản và bấm Play để bắt đầu
                   </div>
                 )}
 

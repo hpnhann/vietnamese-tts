@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🇻🇳 Vietnamese Text-to-Speech (TTS) Pro
 
-## Getting Started
+Một ứng dụng chuyển đổi văn bản thành giọng nói tiếng Việt chuyên nghiệp, hiện đại và mạnh mẽ, được xây dựng bằng **Next.js 15** và **Google Cloud TTS API**.
 
-First, run the development server:
+![Project Screenshot](https://via.placeholder.com/800x400?text=Vietnamese+TTS+Pro+Screenshot)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Tính Năng Nổi Bật
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🎙️ Chất Lượng Giọng Nói Tuyệt Hảo
+- Tích hợp **Google Cloud Text-to-Speech API**.
+- Hỗ trợ **6 giọng đọc** chất lượng cao (Neural2 & WaveNet).
+- Tùy chỉnh **Tốc độ đọc (0.5x - 2x)**.
+- **Voice Preview**: Nghe thử giọng đọc trước khi tạo audio.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 🎧 Trình Phát Audio Nâng Cao
+- **Waveform Visualization**: Hiển thị sóng âm chuyên nghiệp với `wavesurfer.js`.
+- **Điều khiển thông minh**: Play/Pause, tua đoạn, tự động dừng khi preview.
+- **Dark Mode**: Giao diện sóng âm thay đổi theo chế độ sáng/tối.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 📂 Hỗ Trợ Đa Định Dạng File
+Không chỉ nhập văn bản, bạn có thể upload trực tiếp các file tài liệu:
+- **Văn bản**: `.txt`
+- **Tài liệu**: `.docx` (Word), `.pdf`
+- **Dữ liệu**: `.xlsx`, `.xls` (Excel), `.csv`
 
-## Learn More
+### ⚡ Hiệu Năng & Tiện Ích
+- **Smart Caching**: Tự động lưu cache audio để tiết kiệm API và tăng tốc độ tải.
+- **Lịch sử**: Lưu lại các đoạn văn bản đã đọc gần đây.
+- **Phím tắt (Shortcuts)**: Điều khiển nhanh bằng bàn phím (Space, R, D, Arrow Keys...).
+- **Responsive**: Giao diện tương thích hoàn hảo trên Mobile & Desktop.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Công Nghệ Sử Dụng
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Audio Processing**:
+    - `wavesurfer.js` (Audio Visualization)
+- **File Parsing**:
+    - `mammoth` (.docx)
+    - `pdfjs-dist` (.pdf)
+    - `xlsx` (Excel/CSV)
+- **Deployment**: Vercel
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Cài Đặt & Chạy Local
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Clone dự án**:
+    ```bash
+    git clone https://github.com/hpnhann/vietnamese-tts.git
+    cd vietnamese-tts
+    ```
+
+2.  **Cài đặt dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Cấu hình biến môi trường**:
+    - Tạo file `.env.local` tại thư mục gốc.
+    - Thêm API Key của Google Cloud:
+      ```env
+      GOOGLE_CLOUD_API_KEY=your_google_cloud_api_key_here
+      ```
+    *(Lưu ý: Cần kích hoạt **Cloud Text-to-Speech API** trong Google Cloud Console)*
+
+4.  **Chạy server development**:
+    ```bash
+    npm run dev
+    ```
+    Truy cập [http://localhost:3000](http://localhost:3000).
+
+---
+
+## ⌨️ Phím Tắt (Keyboard Shortcuts)
+
+| Phím | Chức năng |
+| :--- | :--- |
+| `Space` / `Enter` | Phát / Tạm dừng |
+| `R` | Phát lại từ đầu (Restart) |
+| `D` | Tải file Audio (.mp3) |
+| `Esc` | Dừng hẳn (Stop) |
+| `↑` / `↓` | Tăng / Giảm tốc độ đọc |
+| `H` | Mở / Đóng Lịch sử |
+| `?` | Xem danh sách phím tắt |
+
+---
+
+## ☁️ Deploy lên Vercel
+
+Dự án này được tối ưu để deploy trên [Vercel](https://vercel.com).
+
+1.  Push code lên GitHub.
+2.  Import project vào Vercel.
+3.  Trong phần **Environment Variables**, thêm:
+    - Key: `GOOGLE_CLOUD_API_KEY`
+    - Value: `[API Key của bạn]`
+4.  Bấm **Deploy**.
+
+---
+
+## 📝 License
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+*Built with ❤️ by [hpnhann]*
