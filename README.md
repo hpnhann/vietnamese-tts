@@ -44,7 +44,7 @@
 
 ## ✨ Tính Năng Đầy Đủ
 
-### 🎙️ **Hệ Thống Text-to-Speech Chuyên Nghiệp**
+### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Studio%20Microphone.png" width="30" /> **Hệ Thống Text-to-Speech Chuyên Nghiệp**
 
 ```
 ✅ 6 giọng đọc Neural2 & WaveNet cao cấp
@@ -54,14 +54,14 @@
 ✅ Xuất file MP3 chất lượng cao
 ```
 
-### 🎵 **Audio Player Đẳng Cấp**
+### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Headphone.png" width="30" /> **Audio Player Đẳng Cấp**
 
 - **Waveform Visualization** - Sóng âm động với `wavesurfer.js`
 - **Progress Bar** thông minh với timestamp
 - **Keyboard Controls** - Điều khiển hoàn toàn bằng phím tắt
 - **Dark Mode** - Sóng âm tự động đổi màu theo theme
 
-### 📄 **Upload & Parse Thông Minh**
+### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Page%20Facing%20Up.png" width="30" /> **Upload & Parse Thông Minh**
 
 | Format | Features | Smart Features |
 |--------|----------|----------------|
@@ -84,7 +84,7 @@ Live preview khi chọn delimiter khác
 Recommended badge cho delimiter phù hợp nhất
 ```
 
-### ⚡ **Performance & UX**
+### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Rocket.png" width="30" /> **Performance & UX**
 
 ```typescript
 🚀 Smart Caching
@@ -105,7 +105,7 @@ Recommended badge cho delimiter phù hợp nhất
    └─ Không conflict với textarea
 ```
 
-### 🎨 **UI/UX Modern**
+### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Artist%20Palette.png" width="30" /> **UI/UX Modern**
 
 - **Dark Mode** - Smooth transitions, persistent preference
 - **Responsive** - Hoàn hảo trên Mobile, Tablet, Desktop
@@ -115,7 +115,7 @@ Recommended badge cho delimiter phù hợp nhất
 
 ---
 
-## 🛠️ Tech Stack
+## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Hammer%20And%20Wrench.png" width="35" /> Tech Stack
 
 ### **Frontend**
 ```
