@@ -1,3 +1,4 @@
+<a name="readme-top"></a>
 # 🎙️ Vietnamese Text-to-Speech Pro
 
 <div align="center">
@@ -111,30 +112,6 @@ Recommended badge cho delimiter phù hợp nhất
 - **Accessibility** - WCAG AA compliant, Screen reader friendly
 - **Animations** - Micro-interactions, hover effects
 - **Icons** - Lucide React - 1000+ icons đẹp
-
----
-
-## 🖼️ Screenshots
-
-<details>
-<summary>📸 Click để xem screenshots (5 ảnh)</summary>
-
-### Main Interface - Light Mode
-![Main Interface](public/screenshots/main-light.png)
-
-### Main Interface - Dark Mode
-![Dark Mode](public/screenshots/main-dark.png)
-
-### Excel Multi-Sheet Selector
-![Excel Selector](public/screenshots/excel-modal.png)
-
-### CSV Delimiter Detector
-![CSV Detector](public/screenshots/csv-modal.png)
-
-### History Sidebar
-![History](public/screenshots/history.png)
-
-</details>
 
 ---
 
@@ -357,32 +334,6 @@ Contributions are welcome! 🎉
 
 ---
 
-## 🐛 Bug Reports & Feature Requests
-
-Có bug hoặc ý tưởng mới? [Tạo issue](https://github.com/hpnhann/vietnamese-tts/issues/new)
-
-**Template issue:**
-```markdown
-**Mô tả bug:**
-[Mô tả chi tiết]
-
-**Steps to reproduce:**
-1. ...
-2. ...
-
-**Expected behavior:**
-[Kết quả mong đợi]
-
-**Screenshots:**
-[Nếu có]
-
-**Environment:**
-- Browser: Chrome 120
-- OS: macOS Sonoma
-```
-
----
-
 ## 💡 FAQ
 
 <details>
@@ -441,9 +392,9 @@ Copyright (c) 2025 hpnhann
 
 **Author:** hpnhann
 
-- 🌐 Website: [your-website.com](#)
-- 📧 Email: [your-email@example.com](mailto:your-email@example.com)
-- 💼 LinkedIn: [linkedin.com/in/yourprofile](#)
+- 🌐 Facebook: [PhucNhan](https://www.facebook.com/kalaa.232300)
+- 📧 Email: [hphuccnhan@gmail.com](mailto:hphuccnhan@gmail.com)
+- 💼 LinkedIn: 
 - 🐙 GitHub: [@hpnhann](https://github.com/hpnhann)
 
 ---
@@ -454,6 +405,6 @@ Copyright (c) 2025 hpnhann
 
 Made with ❤️ and ☕ in Vietnam 🇻🇳
 
-[⬆ Back to top](#-vietnamese-text-to-speech-pro)
+[⬆ Back to top](#readme-top)
 
 </div>
