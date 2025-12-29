@@ -28,7 +28,7 @@
 <p>6 giọng Neural & WaveNet từ Google Cloud - tự nhiên như người thật</p>
 </td>
 <td width="33%" align="center">
-<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Lightning%20Bolt.png" width="60" />
+<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Rocket.png" width="60" />
 <h3>⚡ Siêu Nhanh</h3>
 <p>Smart caching - tải lại nhanh gấp 10 lần, tiết kiệm 80% chi phí API</p>
 </td>
